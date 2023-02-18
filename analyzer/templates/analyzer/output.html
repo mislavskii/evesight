@@ -1,0 +1,125 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+
+
+{% block title %}
+ - Game Log Analysis Output
+{% endblock %}
+
+
+{% block content %}
+
+    {% if processed %}
+
+        <section class="summary">
+
+        <h3>Summary stats</h3>
+
+            <details class="log">
+                <summary>Read the log</summary>
+                <p>
+                    {% for line in lines %}
+                        {{ line }}</br>
+                    {% endfor %}
+                </p>
+            </details>
+
+            <div class="damage">
+
+                <h4>Damage dealt to {{ targets|length }} kinds of targets:</h4>
+                <ul>
+                    {% for target in targets  %}
+                        <li> {{ target }}</li>
+                    {% endfor %}
+                </ul>
+
+
+                <h4>with {{ player_weapons|length }} types of delivery systems:</h4>
+                <ul>
+                    {% for weapon in player_weapons  %}
+                        <li> {{ weapon }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+
+            <div class="damage">
+
+                <h4>Damage taken from {{ enemies|length }} kinds of enemies:</h4>
+                <ul>
+                    {% for enemy in enemies  %}
+                        <li> {{ enemy }} </li>
+                    {% endfor %}
+                </ul>
+
+
+                <h4>via {{ enemy_weapons|length }} types of delivery systems:</h4>
+                <ul>
+                    {% for weapon in enemy_weapons  %}
+                        <li> {{ weapon }}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+
+            {% if incoming_warp_prevention %}
+            <div class="warp">
+                <h4>Incoming warp prevention acts</h4>
+                <ul>
+                    {% for action in incoming_warp_prevention.items %}
+                        <li> <strong> {{ action.0 }} </strong> from: {{ action.1 }} </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if bounty %}
+                <p class="bounty">Earned in bounty: {{ bounty }} ISK</p>
+            {% endif %}
+
+        </section>
+
+        <section class="viz">
+
+            <h3>Visualizations</h3>
+
+            <h4>Delivered damage:</h4>
+
+            {% if player_weapons %}
+                <img src="{% static 'main/images/mean_delivered.png' %}"/>
+                <img src="{% static 'main/images/top_delivered.png' %}"/>
+            {% else %}
+                <li>Nothing to display</li>
+            {% endif %}
+
+            <h4>Received damage:</h4>
+
+            {% if enemies %}
+                <img src="{% static 'main/images/mean_received.png' %}"/>
+                <img src="{% static 'main/images/top_received.png' %}"/>
+                <img src="{% static 'main/images/total_received.png' %}"/>
+            {% else %}
+                <li>Nothing to display</li>
+            {% endif %}
+
+        </section>
+
+    {% else %}
+        <p>
+            Sorry, the analyzer has encountered an error.
+            </br>If sure that the submitted file was a valid unmodified EVE Online Gamelog,
+            be kindly advised to consider sending it manually to the engineer for speedy investigation.
+            Or try again in about fortnight!
+        </p>
+    {% endif %}
+
+    <div class="form">
+        <form action="{% url 'analyzer:upload' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Analyze">
+        </form>
+    </div>
+
+{% endblock %}

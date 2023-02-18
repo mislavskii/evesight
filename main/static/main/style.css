@@ -1,0 +1,78 @@
+body {
+    background: DarkSlateGray url("images/a_moon_in_darkness.png") repeat-y;
+    color: white;
+    font-family: sans-serif;
+    /*max-height: 1080px;*/
+    /*width: 1920px;*/
+    /*overflow-y: scroll;*/
+}
+
+a {
+    color: AntiqueWhite;
+}
+
+.container {
+    /*width: 1100px;*/
+    /*margin: 0 auto;*/
+    padding: 0 17%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+form {
+    display: inline-block;
+    padding: 2em;
+    /*margin: 2em auto;*/
+}
+
+h4 {
+    margin-top: 2em;
+}
+
+div.form {
+    text-align: center;
+}
+
+section {
+    margin-bottom: 3em;
+    clear: both;
+}
+
+details.log > p {
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+div.damage {
+    padding-right: 17%;
+    float: left;
+    padding-bottom: 3em;
+}
+
+.damage li {
+    margin: 0.2em 0;
+}
+
+div.warp {
+    clear: both;
+}
+
+p.bounty {
+    clear: both;
+    font-weight: bold;
+}
+
+.viz img {
+    display: block;
+    width: 90%;
+    margin: 0.5em auto;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    font-size: small;
+    color: lightgray;
+    /*background: #1C3235;*/
+    padding: 0 5px;
+}
