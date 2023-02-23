@@ -4,7 +4,7 @@ from django.shortcuts import render
 from .forms import UploadFileForm
 import os
 
-from .utils import run_analysis
+from .utils import run_analysis, image_dir_prefix
 
 
 def index(request):
@@ -33,7 +33,7 @@ def upload(request):
 def output(request):
     if 'data' not in request.session.keys():
         return HttpResponseRedirect('/analyzer')
-    with os.scandir('main/static/main/images') as it:
+    with os.scandir(image_dir_prefix + 'main/static/main/images') as it:
         for entry in it:
             if 'delivered' in entry.name or 'received' in entry.name:
                 os.remove(entry)

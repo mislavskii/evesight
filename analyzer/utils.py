@@ -16,6 +16,8 @@ def save_uploaded_file(f):
             destination.write(chunk)
     return True
 
+image_dir_prefix = '/home/evesight/mysite/'
+
 
 def run_analysis(data):  # pulling the log as a string from view
     context = {}
@@ -137,7 +139,7 @@ def run_analysis(data):  # pulling the log as a string from view
                             )
             x.ax.tick_params(axis='x', rotation=90)
             plt.title('Mean damage per hit across targets')
-            x.savefig("main/static/main/images/mean_delivered.png")
+            x.savefig(image_dir_prefix + "main/static/main/images/mean_delivered.png")
 
             # Top damage
             x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
@@ -147,7 +149,7 @@ def run_analysis(data):  # pulling the log as a string from view
                             )
             x.ax.tick_params(axis='x', rotation=90)
             plt.title('Top damage per hit across targets')
-            x.savefig("main/static/main/images/top_delivered.png")
+            x.savefig(image_dir_prefix + "main/static/main/images/top_delivered.png")
 
         if enemy_weapons:
             # Plotting mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
@@ -165,7 +167,7 @@ def run_analysis(data):  # pulling the log as a string from view
                             )
             x.ax.tick_params(axis='x', rotation=90)
             plt.title('Mean incoming damage per hit across enemies')
-            x.savefig("main/static/main/images/mean_received.png")
+            x.savefig(image_dir_prefix + "main/static/main/images/mean_received.png")
 
             # Top damage
             x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
@@ -175,7 +177,7 @@ def run_analysis(data):  # pulling the log as a string from view
                             )
             x.ax.tick_params(axis='x', rotation=90)
             plt.title('Top incoming damage per hit across enemies')
-            x.savefig("main/static/main/images/top_received.png")
+            x.savefig(image_dir_prefix + "main/static/main/images/top_received.png")
 
             # Total damage
             x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
@@ -185,6 +187,6 @@ def run_analysis(data):  # pulling the log as a string from view
                             )
             x.ax.tick_params(axis='x', rotation=90)
             plt.title('Total incoming damage across enemies and their weapons')
-            x.savefig("main/static/main/images/total_received.png")
+            x.savefig(image_dir_prefix + "main/static/main/images/total_received.png")
 
     return context
