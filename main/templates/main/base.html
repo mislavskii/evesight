@@ -11,6 +11,10 @@
 
     <body>
     <div class="container">
+    <nav>
+        <a href="{% url 'main:index' %}">Main</a>
+        <a href="{% url 'analyzer:index' %}">Game Log Analyzer</a>
+    </nav>
 
         {% block content %}{% endblock %}
 

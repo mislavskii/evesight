@@ -19,6 +19,27 @@ a {
     overflow-y: auto;
 }
 
+nav {
+    width: 220px;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+}
+
+nav a {
+    display: block;
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+    text-align: center;
+    border: rgba(255, 255, 255, 0.75) solid 1px;
+    margin-bottom: 0.5em;
+}
+
+nav a:hover {
+    border: white solid 2px;
+}
+
 form {
     display: inline-block;
     padding: 2em;
