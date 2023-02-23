@@ -78,6 +78,25 @@ def run_analysis(data):  # pulling the log as a string from view
 
         context['incoming_warp_prevention'] = incoming_warp_prevention
 
+        # Ewar
+
+        neut = [line.replace('GJ energy neutralized', '-', 1
+                             ) for line in combat if ' GJ energy neutralized ' in line[
+                                                                                  :timestamp_length + len(
+                                                                                      ' GJ energy neutralized ') + 5]]
+        neuters = {}
+        for line in neut:
+            sliced = line.split(' - ')
+            candidate = sliced[-1]
+            if sliced[-2] == candidate:
+                if candidate not in neuters.keys():
+                    neuters[candidate] = []
+                neuters[candidate].append(int(sliced[1]))
+        for entity in neuters.keys():
+            neuters[entity] = max(neuters[entity])
+
+        context['neuters'] = neuters
+
         # Summary stats
 
         # Dealt damage
