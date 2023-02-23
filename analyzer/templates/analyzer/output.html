@@ -74,6 +74,17 @@
             </div>
             {% endif %}
 
+            {% if neuters %}
+            <div class="warp">
+                <h4>Incoming energy neutralization acts from:</h4>
+                <ul>
+                    {% for neuter in neuters.items %}
+                        <li> <strong> {{ neuter.0 }} </strong> to the maximum of {{ neuter.1 }} GJ per hit </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
             {% if bounty %}
                 <p class="bounty">Earned in bounty: {{ bounty }} ISK</p>
             {% endif %}

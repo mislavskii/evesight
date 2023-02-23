@@ -49,7 +49,7 @@ div.damage {
     padding-bottom: 3em;
 }
 
-.damage li {
+li {
     margin: 0.2em 0;
 }
 
@@ -60,6 +60,7 @@ div.warp {
 p.bounty {
     clear: both;
     font-weight: bold;
+    margin-top: 3em;
 }
 
 .viz img {
