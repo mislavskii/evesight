@@ -2,7 +2,6 @@
 {% load static %}
 
 
-
 {% block title %}
  - Game Log Analysis Output
 {% endblock %}
@@ -20,7 +19,7 @@
                 <summary>Read the log</summary>
                 <p>
                     {% for line in lines %}
-                        {{ line }}</br>
+                        {{ line }}<br>
                     {% endfor %}
                 </p>
             </details>

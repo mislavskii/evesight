@@ -9,7 +9,7 @@ from .utils import run_analysis
 
 def index(request):
     context = {'form' : UploadFileForm()}
-    context['not_gamelog'] =  request.session.get('not_gamelog', False)
+    context['not_gamelog'] = request.session.get('not_gamelog', False)
     request.session['not_gamelog'] = False
     return render(request, 'analyzer/index.html', context)
 
@@ -33,7 +33,7 @@ def upload(request):
 def output(request):
     if 'data' not in request.session.keys():
         return HttpResponseRedirect('/analyzer')
-    with os.scandir('/home/evesight/mysite/main/static/main/images') as it:
+    with os.scandir('main/static/main/images') as it:
         for entry in it:
             if 'delivered' in entry.name or 'received' in entry.name:
                 os.remove(entry)
