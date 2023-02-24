@@ -3,8 +3,9 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-matplotlib.use("Agg")
+from .local_vars import image_dir_prefix
 
+matplotlib.use("Agg")
 
 sns.set_style("whitegrid")  # setting the visualization style
 sns.set_context("notebook", font_scale=.9)  # setting the visualization scale
@@ -16,7 +17,10 @@ def save_uploaded_file(f):
             destination.write(chunk)
     return True
 
-image_dir_prefix = '/home/evesight/mysite/'
+
+# image_dir_prefix = '/home/evesight/mysite/'
+# image_dir_prefix = ''
+
 
 
 def run_analysis(data):  # pulling the log as a string from view

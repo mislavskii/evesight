@@ -4,7 +4,8 @@ from django.shortcuts import render
 from .forms import UploadFileForm
 import os
 
-from .utils import run_analysis, image_dir_prefix
+from .utils import run_analysis
+from .local_vars import image_dir_prefix
 
 
 def index(request):
