@@ -4,5 +4,5 @@ __pycache__
 /.idea/
 /venv/
 **/main/static/main/images/
-/analyzer/local_vars.py
-/analyzer/temp/
+**/local_vars.py
+**/temp/
