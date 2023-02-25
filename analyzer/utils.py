@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
+from seaborn import FacetGrid
+
 from .local_vars import image_dir_prefix
 
 matplotlib.use("Agg")
@@ -18,9 +20,16 @@ def save_uploaded_file(f):
     return True
 
 
-# image_dir_prefix = '/home/evesight/mysite/'
-# image_dir_prefix = ''
-
+def plot_damage_grid(data, palette, title, save_path):
+    x: FacetGrid = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
+                               data=data,
+                               height=4, aspect=3, linewidth=1, edgecolor='gray',
+                               palette=palette, sizes=(50, 250)
+                               )
+    x.ax.tick_params(axis='x', rotation=90)
+    plt.title(title)
+    x.savefig(image_dir_prefix + save_path)
+    plt.close()
 
 
 def run_analysis(data):  # pulling the log as a string from view
@@ -28,8 +37,7 @@ def run_analysis(data):  # pulling the log as a string from view
     if data:
         lines = data.replace('\\xc2\\xa0', '_').split('\\r\\n')
         lines = [re.sub('<.+?>', '',  # replacing each tag with empty string
-                        line.strip()
-                        ) for line in lines]
+                        line.strip()) for line in lines]
 
         context['lines'] = lines  # log as a list of lines back to view
         context['processed'] = True
@@ -128,32 +136,24 @@ def run_analysis(data):  # pulling the log as a string from view
         context['bounty'] = bounty
 
         # Visualizing
-        if player_weapons:
-            # Plotting mean and top damage scores per weapon across all targets
+        if player_weapons:  # Plotting mean and top damage scores per weapon across all targets
+
             mean_damage_scores = pd.DataFrame(dealt_df.groupby(['Weapon', 'Entity']).Damage.mean()).sort_values(
                 by='Entity').astype('int')
             top_damage_scores = pd.DataFrame(dealt_df.groupby(['Weapon', 'Entity']).Damage.max()).sort_values(
                 by='Entity')
 
             # Mean damage
-            x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
-                            data=mean_damage_scores,
-                            height=4, aspect=3, linewidth=1, edgecolor='gray',
-                            palette='Oranges', sizes=(50, 200)
-                            )
-            x.ax.tick_params(axis='x', rotation=90)
-            plt.title('Mean damage per hit across targets')
-            x.savefig(image_dir_prefix + "main/static/main/images/mean_delivered.png")
+            plot_damage_grid(mean_damage_scores, 'Oranges',
+                             'Mean damage per hit across targets',
+                             "main/static/main/images/mean_delivered.png"
+                             )
 
             # Top damage
-            x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
-                            data=top_damage_scores,
-                            height=4, aspect=3, linewidth=1, edgecolor='gray',
-                            palette='Oranges', sizes=(50, 200)
-                            )
-            x.ax.tick_params(axis='x', rotation=90)
-            plt.title('Top damage per hit across targets')
-            x.savefig(image_dir_prefix + "main/static/main/images/top_delivered.png")
+            plot_damage_grid(top_damage_scores, 'Oranges',
+                             title='Top damage per hit across targets',
+                             save_path="main/static/main/images/top_delivered.png"
+                             )
 
         if enemy_weapons:
             # Plotting mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
@@ -164,33 +164,21 @@ def run_analysis(data):  # pulling the log as a string from view
             totals = pd.DataFrame(incoming_df.groupby(['Weapon', 'Entity']).Damage.sum()).sort_values(by='Entity')
 
             # Mean damage
-            x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
-                            data=mean_damage_scores,
-                            height=4, aspect=3,
-                            palette='Reds', sizes=(100, 250)
-                            )
-            x.ax.tick_params(axis='x', rotation=90)
-            plt.title('Mean incoming damage per hit across enemies')
-            x.savefig(image_dir_prefix + "main/static/main/images/mean_received.png")
+            plot_damage_grid(mean_damage_scores, 'Reds',
+                             'Mean incoming damage per hit across enemies',
+                             "main/static/main/images/mean_received.png"
+                             )
 
             # Top damage
-            x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
-                            data=top_damage_scores,
-                            height=4, aspect=3,
-                            palette='Reds', sizes=(100, 250)
-                            )
-            x.ax.tick_params(axis='x', rotation=90)
-            plt.title('Top incoming damage per hit across enemies')
-            x.savefig(image_dir_prefix + "main/static/main/images/top_received.png")
+            plot_damage_grid(top_damage_scores, 'Reds',
+                             'Top incoming damage per hit across enemies',
+                             "main/static/main/images/top_received.png"
+                             )
 
             # Total damage
-            x = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
-                            data=totals,
-                            height=4, aspect=3,
-                            palette='Reds', sizes=(100, 250)
-                            )
-            x.ax.tick_params(axis='x', rotation=90)
-            plt.title('Total incoming damage across enemies and their weapons')
-            x.savefig(image_dir_prefix + "main/static/main/images/total_received.png")
+            plot_damage_grid(totals, 'Reds',
+                             'Total incoming damage across enemies and their weapons',
+                             "main/static/main/images/total_received.png"
+                             )
 
     return context

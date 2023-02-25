@@ -97,8 +97,8 @@
             <h4>Delivered damage:</h4>
 
             {% if player_weapons %}
-                <img src="{% static 'main/images/mean_delivered.png' %}"/>
-                <img src="{% static 'main/images/top_delivered.png' %}"/>
+                <img src="{% static 'main/images/mean_delivered.png' %}" alt="Mean damage per hit across targets"/>
+                <img src="{% static 'main/images/top_delivered.png' %}" alt="Top damage per hit across targets"/>
             {% else %}
                 <li>Nothing to display</li>
             {% endif %}
@@ -106,9 +106,9 @@
             <h4>Received damage:</h4>
 
             {% if enemies %}
-                <img src="{% static 'main/images/mean_received.png' %}"/>
-                <img src="{% static 'main/images/top_received.png' %}"/>
-                <img src="{% static 'main/images/total_received.png' %}"/>
+                <img src="{% static 'main/images/mean_received.png' %}" alt="Mean incoming damage per hit across enemies"/>
+                <img src="{% static 'main/images/top_received.png' %}" alt="Top incoming damage per hit across enemies"/>
+                <img src="{% static 'main/images/total_received.png' %}" alt="Total incoming damage across enemies and their weapons"/>
             {% else %}
                 <li>Nothing to display</li>
             {% endif %}

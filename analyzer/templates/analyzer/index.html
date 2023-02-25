@@ -6,7 +6,7 @@
 
 {% block content %}
     <h1>In-development: Game Log* Analyzer</h1>
-    <p>*under Windows, typically found at Documents/EVE/logs/Gamelogs</p>
+    <p class="note">* under Windows, typically found in user's Documents folder /EVE/logs/Gamelogs subfolder</p>
     <div class="form">
         <form action="{% url 'analyzer:upload' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -17,12 +17,12 @@
     {% if not_gamelog %}
         <p>
             Submitted file doesn't seem to be a valid unmodified EVE Online Game Log.
-            </br>Please try again with a valid game log or check your intentions.
+            <br>Please try again with a valid game log or check your intentions.
         </p>
     {% endif %}
     <p>
-        For now, designed to output statistics of damage exchange occurred in course
-        of meaningful interactions with other entities while roaming the vast expanses of
+        For now, designed to output statistics for meaningful combat-related interactions
+        occurred in course of encounters with other entities while roaming the vast expanses of
         <a href="https://universe.eveonline.com">New Eden</a>.
     </p>
     <p>
