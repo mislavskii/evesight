@@ -11,23 +11,29 @@ a {
     color: AntiqueWhite;
 }
 
+a:hover {
+    font-weight: bolder;
+}
+
 .container {
     /*width: 1100px;*/
     /*margin: 0 auto;*/
-    padding: 0 17%;
+    padding-left: 260px;
+    padding-right: 11%;
     max-height: 90vh;
     overflow-y: auto;
 }
 
 nav {
-    width: 220px;
+    width: 222px;
     position: fixed;
     top: 15px;
     left: 15px;
 }
 
 nav a {
-    display: block;
+    width: 200px;
+    display: inline-block;
     color: white;
     padding: 10px;
     text-decoration: none;
@@ -97,4 +103,27 @@ footer {
     color: lightgray;
     /*background: #1C3235;*/
     padding: 0 5px;
+}
+
+@media (max-width: 1600px) {
+
+    .container {
+        padding-right: 5%;
+    }
+
+}
+
+@media (max-width: 1200px) {
+
+    .container {
+        padding: 0;
+    }
+
+    nav {
+        width: 100%;
+        position: sticky;
+        top: 0;
+        text-align: center;
+    }
+
 }
