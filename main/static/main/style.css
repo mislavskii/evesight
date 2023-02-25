@@ -71,9 +71,11 @@ details.log > p {
 }
 
 div.damage {
-    padding-right: 17%;
-    float: left;
-    padding-bottom: 3em;
+    display: inline-block;
+    vertical-align: top;
+    padding-right: 9em;
+    /*float: left;*/
+    /*margin-bottom: 1em;*/
 }
 
 li {
@@ -120,10 +122,29 @@ footer {
     }
 
     nav {
-        width: 100%;
+        width: 90%;
         position: sticky;
         top: 0;
         text-align: center;
     }
 
+}
+
+@media (max-device-width: 480px) {
+
+    form {
+        width: 100%;
+    }
+
+    div.damage {
+        padding-right: 0;
+        display: block;
+    }
+
+}
+
+@media (max-height: 480px) {
+        footer {
+        display: none;
+    }
 }
