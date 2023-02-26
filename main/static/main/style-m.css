@@ -52,6 +52,11 @@ h1 {
     min-height: 85vh;
 }
 
+details.log > p {
+    max-height: 66vh;
+    overflow-y: auto;
+}
+
 li {
     line-height: 1.3;
 }
