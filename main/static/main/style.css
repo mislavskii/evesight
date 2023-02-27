@@ -13,7 +13,7 @@ a:hover {
 }
 
 .container {
-    padding-left: 260px;
+    padding-left: 18em;
     padding-right: 11%;
     max-height: 90vh;
     overflow-y: auto;
@@ -26,15 +26,15 @@ a:hover {
 nav {
     width: 222px;
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 1em;
+    left: 1em;
 }
 
 nav a {
     width: 200px;
     display: inline-block;
     color: white;
-    padding: 10px;
+    padding: 1em;
     text-decoration: none;
     text-align: center;
     border: rgba(255, 255, 255, 0.75) solid 1px;
@@ -127,6 +127,7 @@ footer {
 
     nav a {
         font-size: smaller;
+        padding: .7rem;
     }
 
     div.damage {
@@ -145,7 +146,17 @@ footer {
 }
 
 @media (max-height: 480px) {
-        footer {
+    footer {
         display: none;
     }
+
+    nav {
+        font-size: smaller;
+    }
+
+    nav a {
+        padding: .7em;
+        margin-bottom: .1em;
+    }
+
 }

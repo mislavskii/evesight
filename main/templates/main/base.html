@@ -3,8 +3,8 @@
     <head>
     {% load static %}
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="stylesheet" media="screen and (min-device-width: 481px)"  href="{% static 'main/style.css' %}">
-    <link rel="stylesheet" media="screen and (max-device-width: 480px)" href="{% static 'main/style-m.css' %}">
+    <link rel="stylesheet" media="screen and ((max-device-width: 480px) or (max-device-height: 480px))" href="{% static 'main/style-m.css' %}">
+    <link rel="stylesheet" media="screen and (min-device-width: 481px) and (min-device-height: 481px)"  href="{% static 'main/style.css' %}">
     <meta charset="utf-8">
     <title>Evesight
         {% block title %}{% endblock %}
