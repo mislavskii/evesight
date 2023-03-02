@@ -98,6 +98,7 @@
 
             {% if player_weapons %}
                 <img src="{% static 'main/images/mean_delivered.png' %}" alt="Mean damage per hit across targets"/>
+{#                <img src="data:image/png;base64,{{ mean_delivered|safe }}" alt="Mean damage per hit across targets"/>#}
                 <img src="{% static 'main/images/top_delivered.png' %}" alt="Top damage per hit across targets"/>
             {% else %}
                 <li>Nothing to display</li>
@@ -118,7 +119,7 @@
     {% else %}
         <p>
             Sorry, the analyzer has encountered an error.
-            </br>If sure that the submitted file was a valid unmodified EVE Online Gamelog,
+            <br>If sure that the submitted file was a valid unmodified EVE Online Gamelog,
             be kindly advised to consider sending it manually to the engineer for speedy investigation.
             Or try again in about fortnight!
         </p>

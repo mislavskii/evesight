@@ -1,4 +1,7 @@
+from io import BytesIO
 import re
+import base64
+
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
@@ -6,6 +9,7 @@ import seaborn as sns
 from seaborn import FacetGrid
 
 from .local_vars import image_dir_prefix
+from .models import Plot
 
 matplotlib.use("Agg")
 
@@ -13,14 +17,7 @@ sns.set_style("whitegrid")  # setting the visualization style
 sns.set_context("notebook", font_scale=.9)  # setting the visualization scale
 
 
-def save_uploaded_file(f):
-    with open('analyzer/temp/gamelog.txt', 'wb') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-    return True
-
-
-def plot_damage_grid(data, palette, title, save_path):
+def plot_damage_grid(data, palette, title, name):
     x: FacetGrid = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
                                data=data,
                                height=4, aspect=3, linewidth=1, edgecolor='gray',
@@ -28,11 +25,17 @@ def plot_damage_grid(data, palette, title, save_path):
                                )
     x.ax.tick_params(axis='x', rotation=90)
     plt.title(title)
+    save_path = f"main/static/main/images/{name}.png"
     x.savefig(image_dir_prefix + save_path)
+    buf = BytesIO()
+    x.savefig(buf, format='png')
+    buf.seek(0)
     plt.close()
+    return buf.getvalue()
 
 
 def run_analysis(data):  # pulling the log as a string from view
+    plots = Plot(session_id='a')
     context = {}
     if data:
         lines = data.replace('\\xc2\\xa0', '_').split('\\r\\n')
@@ -63,7 +66,7 @@ def run_analysis(data):  # pulling the log as a string from view
                                            line.endswith('- Wrecks'))
         ]
 
-        # and preparing it for dataframing by turning each entry into a row of cells
+        # and preparing it for data-framing by turning each entry into a row of cells
         # installing column separators '-' and performing the split
         hits = [line.replace(' to ', ' - to - ').replace(' from ', ' - from - ').split(' - ') for line in hits]
         # inserting 'Unknown' for missing enemy weapon data
@@ -78,8 +81,8 @@ def run_analysis(data):  # pulling the log as a string from view
 
         # Warp prevention
 
-        warp_prevention = [line for line in combat if line.split(' - ', 1)[1]
-        .startswith('Warp ') and ' attempt from ' in line]
+        warp_prevention = [line for line in combat if line.split(
+            ' - ', 1)[1].startswith('Warp ') and ' attempt from ' in line]
         warp_prevention_df = pd.DataFrame(
             data=[line.replace("from", "-").replace("to", "-").replace('attempt ', '')
                   .rstrip('!').split(' - ') for line in warp_prevention],
@@ -107,7 +110,7 @@ def run_analysis(data):  # pulling the log as a string from view
                     neuters[candidate] = []
                 neuters[candidate].append(int(sliced[1]))
         for entity in neuters.keys():
-            neuters[entity] = max(neuters[entity])
+            neuters[entity] = max(neuters.get(entity))
 
         context['neuters'] = neuters
 
@@ -127,11 +130,8 @@ def run_analysis(data):  # pulling the log as a string from view
         enemy_weapons = incoming_df.Weapon.unique().tolist()
         context['enemy_weapons'] = enemy_weapons
 
-        # bounty = sum([int(line.split(' (bounty) ', 1)[1].split(' ')[0]
-        #     ) for line in lines if " ] (bounty) " in line and " ISK added to next bounty payout" in line])
         bounty = [line.replace('\xa0', '_') for line in lines if " (bounty) " in line[
-                                                                                 :timestamp_length + len(
-                                                                                     ' (bounty) ') + 2] and " ISK added to next bounty payout" in line]
+                    :timestamp_length + len(' (bounty) ') + 2] and " ISK added to next bounty payout" in line]
         bounty = sum([int(line.split(' (bounty) ', 1)[1].split(' ')[0]) for line in bounty])
         context['bounty'] = bounty
 
@@ -144,19 +144,20 @@ def run_analysis(data):  # pulling the log as a string from view
                 by='Entity')
 
             # Mean damage
-            plot_damage_grid(mean_damage_scores, 'Oranges',
-                             'Mean damage per hit across targets',
-                             "main/static/main/images/mean_delivered.png"
-                             )
+            plots.mean_delivered = plot_damage_grid(mean_damage_scores, 'Oranges',
+                                                    'Mean damage per hit across targets',
+                                                    "mean_delivered"
+                                                    )
+            # context['mean_delivered'] = base64.encodebytes(bytearray(plots.mean_delivered))
 
             # Top damage
-            plot_damage_grid(top_damage_scores, 'Oranges',
-                             title='Top damage per hit across targets',
-                             save_path="main/static/main/images/top_delivered.png"
-                             )
+            plots.top_delivered = plot_damage_grid(top_damage_scores, 'Oranges',
+                                                   title='Top damage per hit across targets',
+                                                   name="top_delivered"
+                                                   )
 
+        # Plotting mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
         if enemy_weapons:
-            # Plotting mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
             mean_damage_scores = pd.DataFrame(incoming_df.groupby(['Weapon', 'Entity']).Damage.mean()).sort_values(
                 by='Entity').astype(int)
             top_damage_scores = pd.DataFrame(incoming_df.groupby(['Weapon', 'Entity']).Damage.max()).sort_values(
@@ -164,21 +165,25 @@ def run_analysis(data):  # pulling the log as a string from view
             totals = pd.DataFrame(incoming_df.groupby(['Weapon', 'Entity']).Damage.sum()).sort_values(by='Entity')
 
             # Mean damage
-            plot_damage_grid(mean_damage_scores, 'Reds',
-                             'Mean incoming damage per hit across enemies',
-                             "main/static/main/images/mean_received.png"
-                             )
+            plots.mean_received = plot_damage_grid(mean_damage_scores, 'Reds',
+                                                   'Mean incoming damage per hit across enemies',
+                                                   "mean_received"
+                                                   )
 
             # Top damage
-            plot_damage_grid(top_damage_scores, 'Reds',
-                             'Top incoming damage per hit across enemies',
-                             "main/static/main/images/top_received.png"
-                             )
+            plots.top_received = plot_damage_grid(top_damage_scores, 'Reds',
+                                                  'Top incoming damage per hit across enemies',
+                                                  "top_received"
+                                                  )
 
             # Total damage
-            plot_damage_grid(totals, 'Reds',
-                             'Total incoming damage across enemies and their weapons',
-                             "main/static/main/images/total_received.png"
-                             )
+            plots.total_received = plot_damage_grid(totals, 'Reds',
+                                                    'Total incoming damage across enemies and their weapons',
+                                                    "total_received"
+                                                    )
+
+            plots.save()
+
+            # context['plots'] = plots
 
     return context

@@ -4,13 +4,12 @@ from django.shortcuts import render
 from .forms import UploadFileForm
 import os
 
-from .utils import run_analysis
+from .analyze import run_analysis
 from .local_vars import image_dir_prefix
 
 
 def index(request):
-    context = {'form' : UploadFileForm()}
-    context['not_gamelog'] = request.session.get('not_gamelog', False)
+    context = {'form': UploadFileForm(), 'not_gamelog': request.session.get('not_gamelog', False)}
     request.session['not_gamelog'] = False
     return render(request, 'analyzer/index.html', context)
 
@@ -38,7 +37,12 @@ def output(request):
         for entry in it:
             if 'delivered' in entry.name or 'received' in entry.name:
                 os.remove(entry)
-    context = dict()
     context = run_analysis(request.session['data'])
     context['form'] = UploadFileForm()
     return render(request, 'analyzer/output.html', context)
+
+
+def example(request):
+    with open('analyzer/resources/example-log.txt', 'r') as f:
+        request.session['data'] = f.read()
+        return HttpResponseRedirect('/analyzer/output')

@@ -2,6 +2,7 @@ body {
     background: #192a2a url("images/a_moon_in_darkness.png") repeat-y;
     color: white;
     font-family: sans-serif;
+    line-height: 1.3;
 }
 
 a {
@@ -48,6 +49,11 @@ nav a:hover {
 form {
     /*display: inline-block;*/
     margin: 2em;
+}
+
+p.example {
+    text-align: center;
+    margin-bottom: 3em;
 }
 
 h4 {
