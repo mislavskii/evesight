@@ -97,9 +97,11 @@
             <h4>Delivered damage:</h4>
 
             {% if player_weapons %}
-                <img src="{% static 'main/images/mean_delivered.png' %}" alt="Mean damage per hit across targets"/>
+                <img src="{% static 'main/images/chart_delivered_overall_bars.png' %}" alt="Overall damage per hit across weapons"/>
+                <img src="{% static 'main/images/chart_delivered_totals_pies.png' %}" alt="Totals across weapons"/>
+                <img src="{% static 'main/images/chart_mean_delivered.png' %}" alt="Mean damage per hit across targets"/>
 {#                <img src="data:image/png;base64,{{ mean_delivered|safe }}" alt="Mean damage per hit across targets"/>#}
-                <img src="{% static 'main/images/top_delivered.png' %}" alt="Top damage per hit across targets"/>
+                <img src="{% static 'main/images/chart_top_delivered.png' %}" alt="Top damage per hit across targets"/>
             {% else %}
                 <li>Nothing to display</li>
             {% endif %}
@@ -107,9 +109,11 @@
             <h4>Received damage:</h4>
 
             {% if enemies %}
-                <img src="{% static 'main/images/mean_received.png' %}" alt="Mean incoming damage per hit across enemies"/>
-                <img src="{% static 'main/images/top_received.png' %}" alt="Top incoming damage per hit across enemies"/>
-                <img src="{% static 'main/images/total_received.png' %}" alt="Total incoming damage across enemies and their weapons"/>
+                <img src="{% static 'main/images/chart_received_overall_bars.png' %}" alt="Overall damage per hit across enemies"/>
+                <img src="{% static 'main/images/chart_received_totals_pies.png' %}" alt="Totals across enemies"/>
+                <img src="{% static 'main/images/chart_mean_received.png' %}" alt="Mean incoming damage per hit across enemies"/>
+                <img src="{% static 'main/images/chart_top_received.png' %}" alt="Top incoming damage per hit across enemies"/>
+                <img src="{% static 'main/images/chart_total_received.png' %}" alt="Total incoming damage across enemies and their weapons"/>
             {% else %}
                 <li>Nothing to display</li>
             {% endif %}

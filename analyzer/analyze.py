@@ -1,10 +1,10 @@
-from io import BytesIO
 import re
-import base64
+from io import BytesIO
 
-import pandas as pd
+import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 from seaborn import FacetGrid
 
@@ -17,6 +17,30 @@ sns.set_style("whitegrid")  # setting the visualization style
 sns.set_context("notebook", font_scale=.9)  # setting the visualization scale
 
 
+# function to produce a list of explode values for pie charts
+def pie_exploder(vals):
+    """
+    :vals: a list of values to be represented by the pie vedges, sorted in descending order for best results
+    :return: a list of explode values for pie charts to only explode very narrow vedges
+    :required: numpy
+    """
+    e = 0.01  # default explode value for all vedges
+    explode = np.zeros(len(vals)) + e  # generating default list of uniform explode values with numpy
+    i = 0
+    for val in vals:
+        if val / sum(vals) < 0.03:  # tiny vedge qualification threshold (fraction of the total sum)
+            explode[i] = e  # in the first run, default explode value is applied unchanged
+            e += .09  # incrementing the explode value starting from the second encountered tiny vedge
+        i += 1
+    return explode
+
+
+def plt_savefig(name):
+    save_path = f"main/static/main/images/chart_{name}.png"
+    plt.savefig(image_dir_prefix + save_path)
+    plt.close()
+
+
 def plot_damage_grid(data, palette, title, name):
     x: FacetGrid = sns.relplot(y="Weapon", x="Entity", hue="Damage", size='Damage',
                                data=data,
@@ -25,7 +49,7 @@ def plot_damage_grid(data, palette, title, name):
                                )
     x.ax.tick_params(axis='x', rotation=90)
     plt.title(title)
-    save_path = f"main/static/main/images/{name}.png"
+    save_path = f"main/static/main/images/chart_{name}.png"
     x.savefig(image_dir_prefix + save_path)
     buf = BytesIO()
     x.savefig(buf, format='png')
@@ -99,8 +123,7 @@ def run_analysis(data):  # pulling the log as a string from view
 
         neut = [line.replace('GJ energy neutralized', '-', 1
                              ) for line in combat if ' GJ energy neutralized ' in line[
-                                                                                  :timestamp_length + len(
-                                                                                      ' GJ energy neutralized ') + 5]]
+                                                    :timestamp_length + len(' GJ energy neutralized ') + 5]]
         neuters = {}
         for line in neut:
             sliced = line.split(' - ')
@@ -135,9 +158,68 @@ def run_analysis(data):  # pulling the log as a string from view
         bounty = sum([int(line.split(' (bounty) ', 1)[1].split(' ')[0]) for line in bounty])
         context['bounty'] = bounty
 
-        # Visualizing
-        if player_weapons:  # Plotting mean and top damage scores per weapon across all targets
+        # VISUALIZATIONS
 
+        if player_weapons:
+            # Weapon performance OVERALL - BARS AND PIES
+
+            # data for plotting
+            means_per_weapon = dealt_df.groupby(['Weapon']).Damage.mean()  # .sort_values(ascending=False)
+            tops_per_weapon = dealt_df.groupby(['Weapon']).Damage.max()  # .sort_values(ascending=False)
+            totals_per_weapon = dealt_df.groupby(['Weapon']).Damage.sum().sort_values(ascending=False)
+            hits_per_weapon = dealt_df.Weapon.value_counts()
+
+            #  barcharts of mean and top damage scores per weapon
+            plt.figure(figsize=(10, 3.5))
+            # plt.subplots(layout="constrained")
+
+            plt.subplot(121)
+            means_per_weapon.plot(
+                kind='bar', ylabel='', title='Overall mean damage per hit',
+                color='darkorange', alpha=.85
+            )
+
+            plt.subplot(122)
+            tops_per_weapon.plot(
+                kind='bar', ylabel='', title='Overall top damage per hit',
+                color='darkorange', alpha=.85
+            )
+
+            name = 'delivered_overall_bars'
+            save_path = f"main/static/main/images/chart_{name}.png"
+            plt.savefig(image_dir_prefix + save_path, bbox_inches='tight', pad_inches=0.2)
+            plt.close()
+
+            # piecharts of total damage and hit counts per weapon
+            plt.figure(figsize=(12.5, 3.5), facecolor='white')
+            plt.subplot(121,
+                        xlabel=f'Total: {sum(totals_per_weapon)}')  # plotting total damage per weapon
+            totals_per_weapon.plot(
+                kind='pie', title='Total damage across weapon types', ylabel='',
+                # radius=1.1,
+                labeldistance=1.2,
+                cmap='Oranges_r',
+                startangle=45,
+                explode=pie_exploder(totals_per_weapon)
+            )
+            plt.subplot(122,
+                        xlabel=f'Total: {sum(hits_per_weapon)}')  # plotting total number of hits per weapon
+            hits_per_weapon.plot(
+                kind='pie', title='Total hit count across weapon types', ylabel='',
+                # radius=.9,
+                labeldistance=1.2,
+                cmap='Oranges_r',
+                startangle=45,
+                explode=pie_exploder(hits_per_weapon)
+            )
+            name = 'delivered_totals_pies'
+            save_path = f"main/static/main/images/chart_{name}.png"
+            plt.savefig(image_dir_prefix + save_path)
+            plt.close()
+
+            # FACET GRIDS:
+
+            # Mean and top damage scores per weapon across all targets
             mean_damage_scores = pd.DataFrame(dealt_df.groupby(['Weapon', 'Entity']).Damage.mean()).sort_values(
                 by='Entity').astype('int')
             top_damage_scores = pd.DataFrame(dealt_df.groupby(['Weapon', 'Entity']).Damage.max()).sort_values(
@@ -156,8 +238,73 @@ def run_analysis(data):  # pulling the log as a string from view
                                                    name="top_delivered"
                                                    )
 
-        # Plotting mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
+        # RECEIVED DAMAGE
         if enemy_weapons:
+
+            # Bars and pies
+
+            # Data for plotting
+            means_per_enemy = incoming_df.groupby(['Entity']).Damage.mean()
+            tops_per_enemy = incoming_df.groupby(['Entity']).Damage.max()
+            totals_per_enemy = incoming_df.groupby(['Entity']).Damage.sum().sort_values(ascending=False)
+            hits_per_enemy = incoming_df.Entity.value_counts()
+
+            #  barcharts of mean and top damage taken from each enemy
+
+            plt.figure(figsize=(11, 4))
+            plt.subplot(121)
+            means_per_enemy.plot(
+                kind='bar', ylabel='', title='Overall mean damage per enemy hit',
+                color='darkred', alpha=.85
+            )
+            plt.subplot(122)
+            tops_per_enemy.plot(
+                kind='bar', ylabel='', title='Overall top damage per enemy hit',
+                color='darkred', alpha=.85
+            )
+
+            name = 'received_overall_bars'
+            save_path = f"main/static/main/images/chart_{name}.png"
+            plt.savefig(image_dir_prefix + save_path, bbox_inches='tight', pad_inches=0.2)
+            plt.close()
+
+            # piecharts of total damage and hit counts from each enemy
+
+            height = 3.5  # overall for the figure
+            radius = 1  # for each pie
+            if len(enemies) > 11:  # to provide more space for labels
+                height = 5
+                radius = .7
+
+            plt.figure(figsize=(12, height), facecolor='white')
+            plt.subplot(121,
+                        xlabel=f'Total: {sum(totals_per_enemy)}')  # plotting total damage per enemy
+            totals_per_enemy.plot(
+                kind='pie', title='Total incoming damage across kinds of enemies', ylabel='',
+                radius=radius,
+                labeldistance=1.2,
+                cmap='Reds_r',
+                startangle=45,
+                explode=pie_exploder(totals_per_enemy)
+            )
+            plt.subplot(122,
+                        xlabel=f'Total: {sum(hits_per_enemy)}')  # plotting total number of hits per enemy
+            hits_per_enemy.plot(
+                kind='pie', title='Total incoming hit count across kinds of enemies', ylabel='',
+                radius=radius,
+                labeldistance=1.2,
+                cmap='Reds_r',
+                startangle=45,
+                explode=pie_exploder(hits_per_enemy)
+            )
+
+            name = 'received_totals_pies'
+            save_path = f"main/static/main/images/chart_{name}.png"
+            plt.savefig(image_dir_prefix + save_path)
+            plt.close()
+
+        # Plotting mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
+
             mean_damage_scores = pd.DataFrame(incoming_df.groupby(['Weapon', 'Entity']).Damage.mean()).sort_values(
                 by='Entity').astype(int)
             top_damage_scores = pd.DataFrame(incoming_df.groupby(['Weapon', 'Entity']).Damage.max()).sort_values(
@@ -182,7 +329,7 @@ def run_analysis(data):  # pulling the log as a string from view
                                                     "total_received"
                                                     )
 
-            plots.save()
+            # plots.save()
 
             # context['plots'] = plots
 

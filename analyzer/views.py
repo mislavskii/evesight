@@ -35,7 +35,7 @@ def output(request):
         return HttpResponseRedirect('/analyzer')
     with os.scandir(image_dir_prefix + 'main/static/main/images') as it:
         for entry in it:
-            if 'delivered' in entry.name or 'received' in entry.name:
+            if 'chart' in entry.name:
                 os.remove(entry)
     context = run_analysis(request.session['data'])
     context['form'] = UploadFileForm()
