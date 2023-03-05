@@ -43,6 +43,6 @@ def output(request):
 
 
 def example(request):
-    with open('analyzer/resources/example-log.txt', 'r') as f:
+    with open(image_dir_prefix + 'analyzer/resources/example-log.txt', 'r') as f:
         request.session['data'] = f.read()
         return HttpResponseRedirect('/analyzer/output')

@@ -7,3 +7,4 @@ __pycache__
 **/local_vars.py
 **/temp/
 **/migrations/
+**settings.py
