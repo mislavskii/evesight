@@ -6,6 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from django.utils.http import urlsafe_base64_encode
 from seaborn import FacetGrid
 
 from .local_vars import image_dir_prefix
@@ -55,7 +56,7 @@ def plot_damage_grid(data, palette, title, name):
     x.savefig(buf, format='png')
     buf.seek(0)
     plt.close()
-    return buf.getvalue()
+    return buf.read()
 
 
 def run_analysis(data):  # pulling the log as a string from view
@@ -169,7 +170,7 @@ def run_analysis(data):  # pulling the log as a string from view
             totals_per_weapon = dealt_df.groupby(['Weapon']).Damage.sum().sort_values(ascending=False)
             hits_per_weapon = dealt_df.Weapon.value_counts()
 
-            #  barcharts of mean and top damage scores per weapon
+            # bar charts of mean and top damage scores per weapon
             plt.figure(figsize=(10, 3.5))
             # plt.subplots(layout="constrained")
 
@@ -230,7 +231,7 @@ def run_analysis(data):  # pulling the log as a string from view
                                                     'Mean damage per hit across targets',
                                                     "mean_delivered"
                                                     )
-            # context['mean_delivered'] = base64.encodebytes(bytearray(plots.mean_delivered))
+            context['mean_delivered'] = urlsafe_base64_encode(plots.mean_delivered)
 
             # Top damage
             plots.top_delivered = plot_damage_grid(top_damage_scores, 'Oranges',
@@ -249,7 +250,7 @@ def run_analysis(data):  # pulling the log as a string from view
             totals_per_enemy = incoming_df.groupby(['Entity']).Damage.sum().sort_values(ascending=False)
             hits_per_enemy = incoming_df.Entity.value_counts()
 
-            #  barcharts of mean and top damage taken from each enemy
+            #  bar charts of mean and top damage taken from each enemy
 
             plt.figure(figsize=(11, 4))
             plt.subplot(121)
@@ -303,7 +304,7 @@ def run_analysis(data):  # pulling the log as a string from view
             plt.savefig(image_dir_prefix + save_path)
             plt.close()
 
-        # Plotting mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
+        # Mean, top, and total incoming damage scores per enemy weapon across all kinds of enemies
 
             mean_damage_scores = pd.DataFrame(incoming_df.groupby(['Weapon', 'Entity']).Damage.mean()).sort_values(
                 by='Entity').astype(int)

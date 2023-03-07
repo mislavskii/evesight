@@ -99,7 +99,13 @@ p.bounty {
     display: inline-block;
     max-width: 100%;
     margin-top: 0.5em;
-    margin-left: 2em;
+}
+
+@media screen and (min-width: 1600px) {
+    .viz img {
+        padding-left: 2em;
+        max-width: 90%;
+    }
 }
 
 footer {
@@ -119,6 +125,11 @@ footer {
 }
 
 @media (max-width: 1200px) {
+
+    body {
+        margin-top: 0;
+        padding-top: 0;
+    }
 
     .container {
         padding: 0;
@@ -143,7 +154,7 @@ footer {
     }
 
     .viz img {
-        width: 100%;
+        max-width: 100%;
     }
 
     .footer {
@@ -153,18 +164,18 @@ footer {
 
 }
 
-@media (max-height: 480px) {
-    footer {
-        display: none;
-    }
+/*@media (max-height: 480px) {*/
+/*    footer {*/
+/*        display: none;*/
+/*    }*/
 
-    nav {
-        font-size: smaller;
-    }
+/*    nav {*/
+/*        font-size: smaller;*/
+/*    }*/
 
-    nav a {
-        padding: .7em;
-        margin-bottom: .1em;
-    }
+/*    nav a {*/
+/*        padding: .7em;*/
+/*        margin-bottom: .1em;*/
+/*    }*/
 
-}
+/*}*/
