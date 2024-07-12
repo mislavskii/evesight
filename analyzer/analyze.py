@@ -72,6 +72,56 @@ class Analyzer:
             self.incoming_damage = pd.DataFrame()
             self.run_analysis()
 
+    def run_analysis(self):
+        self.parse_data()
+        self.build_summary_stats()
+        self.build_plots()
+
+    def parse_data(self):
+        self.get_lines()
+        self.get_combat_interactions()
+        self.get_hits()
+        self.get_warp_prevention()
+        self.get_ewar()
+
+    def build_summary_stats(self):
+        # Dealt damage
+        dealt_df = self.hits.loc[self.hits.Direction == 'to']
+        targets = dealt_df.Entity.unique().tolist()
+        self.context['targets'] = targets  # list of targets back to view
+        player_weapons = dealt_df.Weapon.unique().tolist()
+        self.context[
+            'player_weapons'] = player_weapons if player_weapons else None  # list of player weapons back to view
+        # Incoming damage
+        incoming_df = self.hits.loc[self.hits.Direction == 'from']
+        enemies = incoming_df.Entity.unique().tolist()
+        self.context['enemies'] = enemies if enemies else None  # list of enemies back to view
+        enemy_weapons = incoming_df.Weapon.unique().tolist()
+        self.context['enemy_weapons'] = enemy_weapons
+        # Bounties
+        bounty = [
+            line.replace('\xa0', '_') for line in self.context['lines'
+            ] if " (bounty) " in line[:self.TIMESTAMP_LENGTH + len(' (bounty) ') + 2
+                                 ] and " ISK added to next bounty payout" in line
+        ]
+        bounty = sum([int(line.split(' (bounty) ', 1)[1].split(' ')[0]) for line in bounty])
+        self.context['bounty'] = bounty
+        self.dealt_damage = dealt_df
+        self.incoming_damage = incoming_df
+
+    def build_plots(self):
+        if self.context['player_weapons']:
+            self.plot_weapon_performance_per_hit()
+            self.plot_weapon_performance_totals()
+            self.plot_mean_delivered()
+            self.plot_top_delivered()
+        if self.context['enemies']:
+            self.plot_incoming_per_hit()
+            self.plot_incoming_totals()
+            self.plot_mean_received()
+            self.plot_top_received()
+            self.plot_total_received()
+
     def get_lines(self):
         lines = self.data.replace('\\xc2\\xa0', '_').split('\\r\\n')
         lines = [re.sub('<.+?>', '',  # replacing each tag with empty string
@@ -150,38 +200,6 @@ class Analyzer:
         for entity in neuters.keys():
             neuters[entity] = max(neuters.get(entity))
         self.context['neuters'] = neuters
-
-    def parse_data(self):
-        self.get_lines()
-        self.get_combat_interactions()
-        self.get_hits()
-        self.get_warp_prevention()
-        self.get_ewar()
-
-    def build_summary_stats(self):
-        # Dealt damage
-        dealt_df = self.hits.loc[self.hits.Direction == 'to']
-        targets = dealt_df.Entity.unique().tolist()
-        self.context['targets'] = targets  # list of targets back to view
-        player_weapons = dealt_df.Weapon.unique().tolist()
-        self.context[
-            'player_weapons'] = player_weapons if player_weapons else None  # list of player weapons back to view
-        # Incoming damage
-        incoming_df = self.hits.loc[self.hits.Direction == 'from']
-        enemies = incoming_df.Entity.unique().tolist()
-        self.context['enemies'] = enemies if enemies else None  # list of enemies back to view
-        enemy_weapons = incoming_df.Weapon.unique().tolist()
-        self.context['enemy_weapons'] = enemy_weapons
-        # Bounties
-        bounty = [
-            line.replace('\xa0', '_') for line in self.context['lines'
-            ] if " (bounty) " in line[:self.TIMESTAMP_LENGTH + len(' (bounty) ') + 2
-                                 ] and " ISK added to next bounty payout" in line
-        ]
-        bounty = sum([int(line.split(' (bounty) ', 1)[1].split(' ')[0]) for line in bounty])
-        self.context['bounty'] = bounty
-        self.dealt_damage = dealt_df
-        self.incoming_damage = incoming_df
 
     def plot_weapon_performance_per_hit(self):
         # data for plotting
@@ -347,21 +365,3 @@ class Analyzer:
                                                      "total_received"
                                                      )
         self.plots.save()
-
-    def build_plots(self):
-        if self.context['player_weapons']:
-            self.plot_weapon_performance_per_hit()
-            self.plot_weapon_performance_totals()
-            self.plot_mean_delivered()
-            self.plot_top_delivered()
-        if self.context['enemies']:
-            self.plot_incoming_per_hit()
-            self.plot_incoming_totals()
-            self.plot_mean_received()
-            self.plot_top_received()
-            self.plot_total_received()
-
-    def run_analysis(self):
-        self.parse_data()
-        self.build_summary_stats()
-        self.build_plots()
