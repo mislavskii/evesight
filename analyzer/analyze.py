@@ -39,7 +39,6 @@ def pie_exploder(vals):
 def plt_savefig(name):
     save_path = f"main/static/main/images/chart_{name}.png"
     plt.savefig(image_dir_prefix + save_path)
-    plt.close()
 
 
 def plot_damage_grid(data, palette, title, name):
@@ -171,7 +170,7 @@ def run_analysis(data):  # pulling the log as a string from view
             hits_per_weapon = dealt_df.Weapon.value_counts()
 
             # bar charts of mean and top damage scores per weapon
-            plt.figure(figsize=(10, 3.5))
+            plt.figure(figsize=(10, 3.5), facecolor='white')
             # plt.subplots(layout="constrained")
 
             plt.subplot(121)
@@ -189,6 +188,14 @@ def run_analysis(data):  # pulling the log as a string from view
             name = 'delivered_overall_bars'
             save_path = f"main/static/main/images/chart_{name}.png"
             plt.savefig(image_dir_prefix + save_path, bbox_inches='tight', pad_inches=0.2)
+
+            # Convert the plot to a binary image
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            image_data = buffer.getvalue()
+            # Save the plot to the database
+            plots.mean_delivered = image_data
+            plots.save()
             plt.close()
 
             # piecharts of total damage and hit counts per weapon
