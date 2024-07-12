@@ -4,7 +4,7 @@ from django.shortcuts import render
 from .forms import UploadFileForm
 import os
 
-from .analyze import run_analysis, Analyzer
+from .analyze import Analyzer
 from .local_vars import image_dir_prefix
 
 
@@ -37,7 +37,6 @@ def output(request):
         for entry in it:
             if 'chart' in entry.name:
                 os.remove(entry)
-    # context = run_analysis(request.session['data'])
     analyzer = Analyzer(request.session['data'])
     context = analyzer.context
     context['form'] = UploadFileForm()
